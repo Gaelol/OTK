@@ -33,10 +33,11 @@ def main():
 
     def affiche():
         # permet d'afficher les x premiers events de mon calendrier
-        nbrEvent = int(input("Combien d'evenements voulez-vous afficher ?"))
-        now = datetime.utcnow().isoformat() + 'Z' #Z pour le lieu UTC
-        print('Voici les ', nbrEvent, ' premiers éléments')
-        events_result = service.events().list(calendarId='primary', timeMin=now, maxResults=nbrEvent, singleEvents=True,
+        nbr_event = int(input("Combien d'evenements voulez-vous afficher ?"))
+        now = datetime.utcnow().isoformat() + 'Z'  # Z pour le lieu UTC
+        print('Voici les ', nbr_event, ' premiers éléments')
+        events_result = service.events().list(calendarId='primary', timeMin=now,
+                                              maxResults=nbr_event, singleEvents=True,
                                               orderBy='startTime').execute()
         events = events_result.get('items', [])
         if not events:
@@ -52,7 +53,7 @@ def main():
         duree = int(input('Combien de temps dure l"evenement en heure'))
         end_time = start_time + timedelta(hours=duree)
         timezone = 'Europe/Brussels'
-        newEvent = {
+        new_event = {
             'summary': nom,
             'start': {
                 'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -71,7 +72,7 @@ def main():
             },
         }
 
-        ev = service.events().insert(calendarId='primary', body=newEvent).execute()
+        ev = service.events().insert(calendarId='primary', body=new_event).execute()
         print((ev.get('htmlLink')))
 
     def commu():
@@ -84,7 +85,7 @@ def main():
         attend = (input('Avec qui allez vous participer?'))
 
         timezone = 'Europe/Brussels'
-        eventCommu = {
+        event_commu = {
             'summary': nom,
             'start': {
                 'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -106,7 +107,7 @@ def main():
                 ],
             },
         }
-        ev = service.events().insert(calendarId='primary', body=eventCommu).execute()
+        ev = service.events().insert(calendarId='primary', body=event_commu).execute()
         print((ev.get('htmlLink')))
 
     while 1:
