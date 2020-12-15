@@ -1,0 +1,29 @@
+<Root>:
+    Login:
+    Inicio:
+    Chamada:        
+<Login>:
+    name: 'login'
+    GridLayout:
+        cols:2
+        TextInput:
+            id:txt_usr
+        Label:
+            text:'Senha'
+        TextInput:
+            id:txt_pass
+        Button:
+            text: ' Entrar'
+            on_release: app.root.current = 'inicio'
+
+<Inicio>:
+    name:'inicio'
+    GridLayout:
+        cols:1
+        Button:
+            text:'Chamada'
+            on_release: app.root.current = 'chamada'
+<Chamada>:
+    name:'chamada'
+    GridLayout:
+        id:grid

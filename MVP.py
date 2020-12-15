@@ -1,10 +1,14 @@
 from __future__ import print_function
-from datetime import datetime, timedelta
-import pickle
+
 import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
+import pickle
+from datetime import datetime, timedelta
+
 from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+import Event
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -32,6 +36,11 @@ def main():
     service = build('calendar', 'v3', credentials=creds)
 
     def affiche():
+        """affiche les x futurs évènements prévus dans le google calendar
+
+                PRE : ?
+                POST : ?
+                """
         # permet d'afficher les x premiers events de mon calendrier
         nbr_event = int(input("Combien d'evenements voulez-vous afficher ?"))
         now = datetime.utcnow().isoformat() + 'Z'  # Z pour le lieu UTC
@@ -46,6 +55,11 @@ def main():
             print(event['start'].get('dateTime'), event['summary'])
 
     def perso():
+        """Ajoute un évenement personnel au calendrier de la personne connectée
+
+                PRE : ?
+                POST : ?
+                """
         # permet de creer un evenement uniquement pour moi
         nom = input('Quel est le nom de l"évènement')
         start_time = datetime.strptime(input('Entrez la date de départ en format (2000-00-00T00:00:00)'),
@@ -53,29 +67,17 @@ def main():
         duree = int(input('Combien de temps dure l"evenement en heure'))
         end_time = start_time + timedelta(hours=duree)
         timezone = 'Europe/Brussels'
-        new_event = {
-            'summary': nom,
-            'start': {
-                'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                'timeZone': timezone,
-            },
-            'end': {
-                'dateTime': end_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                'timeZone': timezone,
-            },
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                ],
-            },
-        }
-
+        my_eve = Event.Event(nom, start_time, end_time, timezone)
+        new_event = my_eve.eventPerso()
         ev = service.events().insert(calendarId='primary', body=new_event).execute()
         print((ev.get('htmlLink')))
 
     def commu():
+        """Ajoute un évenement communautaire pouvant regrouper plusieurs personnes
+
+                PRE : ?
+                POST : ?
+                """
         # permet de creer un evenement et d'y ajouter des gens
         nom = input('Quel est le nom de l"évènement')
         start_time = datetime.strptime(input('Entrez la date de départ en format (2000-00-00T00:00:00)'),
@@ -83,30 +85,9 @@ def main():
         duree = int(input('Combien de temps dure l"evenement en heure'))
         end_time = start_time + timedelta(hours=duree)
         attend = (input('Avec qui allez vous participer?'))
-
         timezone = 'Europe/Brussels'
-        event_commu = {
-            'summary': nom,
-            'start': {
-                'dateTime': start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                'timeZone': timezone,
-            },
-            'end': {
-                'dateTime': end_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                'timeZone': timezone,
-            },
-            'attendees': [
-                {'email': attend}
-
-            ],
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                ],
-            },
-        }
+        my_eve = Event.EventCommu(attend, nom, start_time, end_time, timezone)
+        event_commu = my_eve.eventPerso()
         ev = service.events().insert(calendarId='primary', body=event_commu).execute()
         print((ev.get('htmlLink')))
 
@@ -127,7 +108,7 @@ if __name__ == '__main__':
 
 """
 piste d'amelioration : 
-classe event orienté objet
+classe event orienté objet OK
 utilisation simultanée
 fonction de tri quand tout le monde a complété ses horaires
 mise en forme visuelle du formulaire d'information
